@@ -43,13 +43,20 @@ MC Translator перед отправкой текста в переводчик
 
 ## Установка и запуск
 
-**Готовая сборка для Windows** (без установки Python): скачайте `MC_Translator_*_win64.zip` со страницы [релизов](https://github.com/KiLlEr135/mc-translator/releases/latest), распакуйте и запустите `MC_Translator.exe`.
+**Готовая сборка для Windows** (без установки Python): скачайте `MC_Translator_*_win64.zip` со страницы [релизов](https://github.com/KiLlEr135/mc-translator/releases/latest), распакуйте и запустите `MC_Translator.exe`. При запуске приложение само проверяет GitHub на новую версию и пишет в лог уведомление со ссылкой на скачивание, если вышла более новая.
 
 Запуск из исходников требует Python 3.10+.
 
 ```
-git clone <URL этого репозитория>
-cd Progect-Minecraft-Translate
+pip install git+https://github.com/KiLlEr135/mc-translator.git
+mc-translator
+```
+
+Либо вручную из клона репозитория:
+
+```
+git clone https://github.com/KiLlEr135/mc-translator.git
+cd mc-translator
 pip install -r requirements.txt
 python -m mc_translator
 ```

@@ -13,10 +13,12 @@ import json
 import logging
 import os
 import platform
+import re
 import subprocess
 import threading
 from logging.handlers import RotatingFileHandler
 
+import requests
 import webview
 
 from mc_translator import __version__, text_processing
@@ -32,6 +34,32 @@ from mc_translator.text_processing import is_displayable_source
 from mc_translator.usage_log import load_usage_log
 from mc_translator.utils.app_paths import app_path
 from mc_translator.utils.version_detector import detect_mc_version
+
+# Public repo this build reports updates against -- see README's release
+# link. NOT the old upstream project; this is the user's own published fork.
+UPDATE_REPO = "KiLlEr135/mc-translator"
+
+
+def _is_newer_version(current: str, latest: str) -> bool:
+    """Numeric (not lexicographic) comparison, so e.g. '9.9' isn't
+    incorrectly "newer" than '9.10'."""
+    def _parts(v: str) -> tuple[int, ...]:
+        return tuple(int(p) for p in re.findall(r"\d+", v))
+    return _parts(latest) > _parts(current)
+
+
+def _check_latest_release(repo: str, current_version: str, timeout: float = 5) -> str | None:
+    """Returns the latest GitHub release's version string if it's newer than
+    current_version, else None. Never raises -- an unreachable GitHub or a
+    malformed response is treated the same as "no update available" so a
+    flaky connection can't affect startup."""
+    try:
+        resp = requests.get(f"https://api.github.com/repos/{repo}/releases/latest", timeout=timeout)
+        resp.raise_for_status()
+        latest = resp.json().get("tag_name", "").lstrip("vV")
+    except Exception:
+        return None
+    return latest if latest and _is_newer_version(current_version, latest) else None
 
 
 def _setup_file_logger() -> logging.Logger:
@@ -426,8 +454,21 @@ class Api(SettingsMixin, CacheOpsMixin, AiSetupMixin):
         threading.Thread(target=run, daemon=True).start()
         return {"ok": True}
 
+    def check_updates(self) -> None:
+        """Checks GitHub's latest release in a background thread (daemon, so
+        it never blocks/delays shutdown) and logs a notice if a newer build
+        exists. Silent no-op on any failure -- see _check_latest_release."""
+        def run() -> None:
+            latest = _check_latest_release(UPDATE_REPO, __version__)
+            if latest:
+                self.on_log(f"🔔 Доступна новая версия: v{latest}!", "cyan")
+                self.on_log(f"   Скачать: https://github.com/{UPDATE_REPO}/releases/latest", "dim")
+
+        threading.Thread(target=run, daemon=True).start()
+
     def notify_ready(self) -> None:
         """Called once by JS after the page has finished its initial render,
         so the polish log line appears after the log panel exists."""
         if self._polish_total:
             self.on_log(f"✨ Кэш отполирован: исправлено {self._polish_total} строк.", "magenta")
+        self.check_updates()

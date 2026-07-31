@@ -129,3 +129,100 @@ def test_save_settings_refused_while_job_running(api, monkeypatch):
     result = api.save_settings({"aiExePath": "koboldcpp.exe"})
 
     assert result["ok"] is False
+
+
+# ---------------------------------------------------------------------
+# Update check (GitHub releases)
+# ---------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "current,latest,expected",
+    [
+        ("9.1.0", "9.2.0", True),
+        ("9.1.0", "10.0.0", True),
+        ("9.9.0", "9.10.0", True),  # numeric, not lexicographic, comparison
+        ("9.1.0", "9.1.0", False),
+        ("9.1.0", "9.0.5", False),
+        ("v9.1.0", "v9.1.1", True),  # a leading "v" on either side is fine
+    ],
+)
+def test_is_newer_version(current, latest, expected):
+    assert bridge_module._is_newer_version(current, latest) is expected
+
+
+class _FakeResponse:
+    def __init__(self, payload, status=200):
+        self._payload = payload
+        self.status_code = status
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
+
+    def json(self):
+        return self._payload
+
+
+def test_check_latest_release_returns_version_when_newer(monkeypatch):
+    monkeypatch.setattr(
+        bridge_module.requests, "get", lambda url, timeout=5: _FakeResponse({"tag_name": "v9.5.0"})
+    )
+    assert bridge_module._check_latest_release("owner/repo", "9.1.0") == "9.5.0"
+
+
+def test_check_latest_release_returns_none_when_not_newer(monkeypatch):
+    monkeypatch.setattr(
+        bridge_module.requests, "get", lambda url, timeout=5: _FakeResponse({"tag_name": "v9.1.0"})
+    )
+    assert bridge_module._check_latest_release("owner/repo", "9.1.0") is None
+
+
+def test_check_latest_release_silently_returns_none_on_network_failure(monkeypatch):
+    def raise_error(url, timeout=5):
+        raise ConnectionError("offline")
+
+    monkeypatch.setattr(bridge_module.requests, "get", raise_error)
+    assert bridge_module._check_latest_release("owner/repo", "9.1.0") is None
+
+
+def test_check_latest_release_returns_none_on_malformed_response(monkeypatch):
+    monkeypatch.setattr(bridge_module.requests, "get", lambda url, timeout=5: _FakeResponse({}))
+    assert bridge_module._check_latest_release("owner/repo", "9.1.0") is None
+
+
+def test_check_updates_logs_notice_when_newer_version_available(api, monkeypatch):
+    class _ImmediateThread:
+        def __init__(self, target, daemon=None):
+            self._target = target
+
+        def start(self):
+            self._target()
+
+    monkeypatch.setattr(bridge_module.threading, "Thread", _ImmediateThread)
+    monkeypatch.setattr(bridge_module, "_check_latest_release", lambda repo, current: "9.9.0")
+    logged = []
+    monkeypatch.setattr(api, "on_log", lambda message, tag="white": logged.append(message))
+
+    api.check_updates()
+
+    assert any("9.9.0" in message for message in logged)
+    assert any(bridge_module.UPDATE_REPO in message for message in logged)
+
+
+def test_check_updates_logs_nothing_when_up_to_date(api, monkeypatch):
+    class _ImmediateThread:
+        def __init__(self, target, daemon=None):
+            self._target = target
+
+        def start(self):
+            self._target()
+
+    monkeypatch.setattr(bridge_module.threading, "Thread", _ImmediateThread)
+    monkeypatch.setattr(bridge_module, "_check_latest_release", lambda repo, current: None)
+    logged = []
+    monkeypatch.setattr(api, "on_log", lambda message, tag="white": logged.append(message))
+
+    api.check_updates()
+
+    assert logged == []

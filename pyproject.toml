@@ -1,3 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mc-translator"
+dynamic = ["version"]
+description = "Автоматический переводчик модпаков Minecraft (моды, квесты, книги) с сохранением игровых кодов форматирования"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "pywebview>=6.0,<7",
+    "requests>=2.31.0,<3",
+    "ruamel.yaml>=0.18.0,<1",
+    "tomlkit>=0.12.0,<1",
+    "nbtlib>=2.0.4,<3",
+    "lxml>=5.1.0,<7",
+    "Pillow>=10.0.0,<13",
+]
+
+[project.scripts]
+mc-translator = "mc_translator.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/KiLlEr135/mc-translator"
+
+[tool.setuptools.dynamic]
+version = { attr = "mc_translator.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["mc_translator*"]
+
 [tool.ruff]
 line-length = 160
 target-version = "py310"
