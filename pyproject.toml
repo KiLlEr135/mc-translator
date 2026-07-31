@@ -31,6 +31,12 @@ version = { attr = "mc_translator.__version__" }
 [tool.setuptools.packages.find]
 include = ["mc_translator*"]
 
+[tool.setuptools.package-data]
+# The GUI is HTML/CSS/JS served straight out of the installed package (see
+# gui/app.py's _web_dir()) -- without this, setuptools only ships .py files
+# and a pip-installed `mc-translator` launches to a blank/broken window.
+mc_translator = ["gui/web/**/*"]
+
 [tool.ruff]
 line-length = 160
 target-version = "py310"
