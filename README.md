@@ -1,5 +1,9 @@
 # MC Translator
 
+[![PyPI](https://img.shields.io/pypi/v/mc-translator.svg)](https://pypi.org/project/mc-translator/)
+[![Последний релиз](https://img.shields.io/github/v/release/KiLlEr135/mc-translator)](https://github.com/KiLlEr135/mc-translator/releases/latest)
+[![Лицензия: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Инструмент для автоматического перевода модпаков Minecraft — интерфейсы модов, квесты (FTB Quests, KubeJS), книги-гайды (Patchouli, GuideME) и конфиги — на другой язык, без поломки игровых кодов форматирования и без вреда для оригинальных `.jar`-файлов модов.
 
 Настольное приложение (GUI на pywebview) с полноценным headless CLI-режимом для автоматизации.
@@ -46,6 +50,15 @@ MC Translator перед отправкой текста в переводчик
 **Готовая сборка для Windows** (без установки Python): скачайте `MC_Translator_*_win64.zip` со страницы [релизов](https://github.com/KiLlEr135/mc-translator/releases/latest), распакуйте и запустите `MC_Translator.exe`. При запуске приложение само проверяет GitHub на новую версию и пишет в лог уведомление со ссылкой на скачивание, если вышла более новая.
 
 Запуск из исходников требует Python 3.10+.
+
+**Через pip** (пакет [mc-translator](https://pypi.org/project/mc-translator/) на PyPI):
+
+```
+pip install mc-translator
+mc-translator
+```
+
+Либо прямо из GitHub (без релиза на PyPI, если нужна самая свежая версия из `main`):
 
 ```
 pip install git+https://github.com/KiLlEr135/mc-translator.git
