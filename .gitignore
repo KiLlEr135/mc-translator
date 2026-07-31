@@ -34,6 +34,7 @@ data/
 .claude/
 .mcp.json
 skills-lock.json
+CLAUDE.md
 
 # Personal Obsidian vault / project journal -- lives outside the repo now.
 Progect-Minecraf-Translate/
