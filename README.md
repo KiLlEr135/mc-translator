@@ -43,7 +43,9 @@ MC Translator перед отправкой текста в переводчик
 
 ## Установка и запуск
 
-Требуется Python 3.10+.
+**Готовая сборка для Windows** (без установки Python): скачайте `MC_Translator_*_win64.zip` со страницы [релизов](https://github.com/KiLlEr135/mc-translator/releases/latest), распакуйте и запустите `MC_Translator.exe`.
+
+Запуск из исходников требует Python 3.10+.
 
 ```
 git clone <URL этого репозитория>
