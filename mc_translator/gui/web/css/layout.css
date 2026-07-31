@@ -1,0 +1,392 @@
+/* MC Translator — structural layout only: positions, dimensions, flex/grid
+   wiring, overlay placement, z-index. Visual styling (color, border,
+   shadow, radius, typography) lives in components.css — a selector here
+   should never also declare background/border/box-shadow, so the two files
+   never fight over the same property. */
+
+/* ---------------------------------------------------------------- */
+/* App shell                                                         */
+/* ---------------------------------------------------------------- */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.app-header {
+  flex-shrink: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  z-index: var(--z-header);
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.app-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* ---------------------------------------------------------------- */
+/* Rail (sidebar)                                                     */
+/* ---------------------------------------------------------------- */
+
+.rail {
+  width: 360px;
+  min-width: 360px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.rail-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.rail-scroll > * {
+  flex-shrink: 0;
+}
+
+.rail-card--grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.rail-footer {
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-rail-footer);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rail-footer__row {
+  display: flex;
+  gap: var(--space-2);
+}
+.rail-footer__row > .btn {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Content                                                            */
+/* ---------------------------------------------------------------- */
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  gap: var(--space-3);
+}
+
+.content-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+/* Qualified with the parent class (not just .content-toolbar__review) so
+   this beats components.css's .btn{width:100%} on specificity rather than
+   losing to it on source order — both rules are otherwise single-class. */
+.content-toolbar .content-toolbar__review {
+  width: auto;
+  margin: 0;
+  margin-left: auto;
+}
+
+.log-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.status-label {
+  flex-shrink: 0;
+}
+
+/* Activity chip (busy indicator) — small fixed-size box, procedural flame
+   lives in it via ::before/::after (see animations.css). */
+.activity-chip {
+  position: relative;
+  flex-shrink: 0;
+  width: 34px;
+  height: 38px;
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Accordion sub-panels (engine/output) — grid-rows technique: the
+   grid track animates 0fr -> 1fr, the inner wrapper clips overflow. More
+   accurate than animating max-height against a guessed pixel ceiling. */
+/* ---------------------------------------------------------------- */
+
+.sub-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+.sub-panel.open {
+  grid-template-rows: 1fr;
+}
+.sub-panel__inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Settings drawer                                                    */
+/* ---------------------------------------------------------------- */
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: var(--z-backdrop);
+}
+.drawer-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  max-width: 90vw;
+  height: 100%;
+  padding: var(--space-5);
+  overflow-y: auto;
+  z-index: var(--z-drawer);
+  transform: translateX(100%);
+}
+.drawer.open {
+  transform: translateX(0);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: var(--space-3);
+}
+.tab-btn {
+  flex: 1;
+}
+
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.field-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+.field-row .mc-input {
+  flex: 1;
+  margin: 0;
+}
+.field-row .btn {
+  width: auto;
+  margin: 0;
+}
+
+.filetypes-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.filetypes-actions .btn {
+  margin: 0;
+  width: auto;
+  flex: 1;
+}
+.filetypes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Modals                                                             */
+/* ---------------------------------------------------------------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+}
+.modal-backdrop.visible {
+  display: flex;
+}
+
+.modal {
+  width: 380px;
+  padding: var(--space-5);
+}
+.modal-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.modal-actions .btn {
+  margin: 0;
+}
+
+.cache-clear-modal {
+  width: 440px;
+}
+.cache-clear-checklist {
+  display: none;
+  flex-wrap: wrap;
+  gap: 2px var(--space-4);
+  max-height: 160px;
+  overflow-y: auto;
+  margin: var(--space-2) 0;
+  padding: var(--space-2);
+}
+.cache-clear-checklist .mc-checkbox {
+  width: auto;
+}
+.cache-clear-empty {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* Celebration overlay                                                */
+/* ---------------------------------------------------------------- */
+
+.celebrate-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: var(--z-celebrate);
+  opacity: 0;
+}
+
+.celebrate-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.celebrate-confetti span {
+  position: absolute;
+  top: -20px;
+  width: 8px;
+  height: 8px;
+}
+/* 12 pre-authored horizontal slots + randomized-looking fall timing —
+   deterministic (no Math.random(), see animations.css keyframes), but
+   varied enough per span to read as scattered confetti rather than a grid. */
+.celebrate-confetti span:nth-child(1)  { left: 4%; }
+.celebrate-confetti span:nth-child(2)  { left: 12%; }
+.celebrate-confetti span:nth-child(3)  { left: 21%; }
+.celebrate-confetti span:nth-child(4)  { left: 30%; }
+.celebrate-confetti span:nth-child(5)  { left: 39%; }
+.celebrate-confetti span:nth-child(6)  { left: 48%; }
+.celebrate-confetti span:nth-child(7)  { left: 57%; }
+.celebrate-confetti span:nth-child(8)  { left: 66%; }
+.celebrate-confetti span:nth-child(9)  { left: 75%; }
+.celebrate-confetti span:nth-child(10) { left: 84%; }
+.celebrate-confetti span:nth-child(11) { left: 91%; }
+.celebrate-confetti span:nth-child(12) { left: 97%; }
+
+/* ---------------------------------------------------------------- */
+/* Translation review screen                                          */
+/* ---------------------------------------------------------------- */
+
+.review-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-review);
+  display: none;
+  flex-direction: column;
+  padding: var(--space-4);
+}
+.review-overlay.open {
+  display: flex;
+}
+
+.review-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.review-toolbar .review-search {
+  flex: 1;
+  margin: 0;
+}
+/* Qualified with the parent class for the same specificity reason as
+   .content-toolbar .content-toolbar__review above. */
+.review-toolbar .review-rebuild,
+.review-toolbar .review-close,
+.review-toolbar .review-refresh {
+  width: auto;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.review-table-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-table-header, .review-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 220px 90px;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+}
+
+.review-table-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.review-table-wrap .review-load-more {
+  width: auto;
+  align-self: center;
+  margin: var(--space-3) 0 0 0;
+  display: none;
+}

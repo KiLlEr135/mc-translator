@@ -1,0 +1,41 @@
+[tool.ruff]
+line-length = 160
+target-version = "py310"
+exclude = ["build", "dist", "scripts"]
+
+[tool.ruff.lint]
+# E9/F = real bugs (syntax errors, undefined names, unused imports, etc.);
+# I = import sort/format; UP = outdated syntax for the project's py310+
+# floor. Deliberately NOT the full "E"/"W" pycodestyle family -- this is a
+# Cyrillic-log-string-heavy codebase with plenty of legitimately long lines
+# (see E501 ignore below); a full style pass is a separate, much larger
+# effort than "add a linter", and out of scope for a first pass.
+select = ["E9", "F", "I", "UP"]
+ignore = [
+    "E501",  # line length -- see line-length above; not worth failing CI over long log/comment lines
+    # F821 (undefined-name) / UP037 (remove quotes from annotation): many
+    # processors deliberately use a QUOTED forward reference (e.g.
+    # `state: "JobState"`) as a never-evaluated, import-free type hint --
+    # JobState is intentionally NOT imported in these files to avoid a
+    # circular import (mc_translator.runtime.state imports back through
+    # the processors). Ruff can't tell "unresolved on purpose" from "typo",
+    # and its --fix for UP037 would strip the quotes and turn this into a
+    # REAL NameError at import time -- verified by hand before adding this
+    # ignore, do not remove without re-checking every hit stays quoted.
+    "F821",
+    "UP037",
+]
+
+[tool.coverage.run]
+source = ["mc_translator"]
+omit = [
+    "mc_translator/gui/app.py",       # pywebview window bootstrap -- needs a real display, not unit-testable
+    "mc_translator/__main__.py",      # thin CLI/GUI entry-point dispatch
+]
+
+[tool.coverage.report]
+skip_empty = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]

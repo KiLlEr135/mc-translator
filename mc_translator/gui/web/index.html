@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>MC Translator</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<div id="app" class="app-shell">
+
+  <header class="app-header">
+    <div class="app-header__brand">
+      <span class="brand-badge slot-frame" aria-hidden="true">⛏</span>
+      <span class="brand-word">MC TRANSLATOR</span>
+    </div>
+    <div class="app-header__actions">
+      <button class="icon-btn" id="btn-dict" title="Словарь">📔</button>
+      <button class="icon-btn" id="btn-clear-cache" title="Очистить кэш">🧹</button>
+      <button class="icon-btn" id="btn-open-output" title="Открыть папку результата">📂</button>
+      <button class="icon-btn" id="btn-settings" title="Настройки">⚙</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <aside class="rail" id="sidebar">
+      <div class="rail-scroll">
+        <section class="rail-card" style="--i:0">
+          <h3 class="rail-card__title">Папка Minecraft</h3>
+          <div class="folder-label" id="folder-label">Не выбрана</div>
+          <button class="btn" id="btn-select-folder">📁 Выбрать папку</button>
+        </section>
+
+        <section class="rail-card rail-card--grid2" style="--i:1">
+          <div class="rail-card__col">
+            <h3 class="rail-card__title">Целевой язык</h3>
+            <select id="select-lang" class="mc-select"></select>
+          </div>
+          <div class="rail-card__col">
+            <h3 class="rail-card__title">Версия игры</h3>
+            <select id="select-mcver" class="mc-select"></select>
+          </div>
+        </section>
+
+        <section class="rail-card" style="--i:2">
+          <h3 class="rail-card__title">Метод сохранения</h3>
+          <label class="mc-radio">
+            <input type="radio" name="output-mode" value="resourcepack">
+            <span>📦 Resource Pack + Datapack (рекомендуется)</span>
+          </label>
+          <input type="text" id="input-pack-name" class="mc-input" placeholder="Имя zip-файлов...">
+          <label class="mc-radio">
+            <input type="radio" name="output-mode" value="inplace">
+            <span>⚠️ Перезаписать .jar (ломает подписи)</span>
+          </label>
+        </section>
+
+        <section class="rail-card" style="--i:3">
+          <h3 class="rail-card__title">Что переводим?</h3>
+          <label class="mc-checkbox"><input type="checkbox" id="chk-mods"><span>Интерфейс (моды)</span></label>
+          <label class="mc-checkbox"><input type="checkbox" id="chk-books"><span>Справочники и исследования</span></label>
+          <label class="mc-checkbox"><input type="checkbox" id="chk-quests"><span>Квесты (FTB + KubeJS)</span></label>
+        </section>
+
+        <section class="rail-card" style="--i:4">
+          <h3 class="rail-card__title">Движок перевода</h3>
+          <label class="mc-radio">
+            <input type="radio" name="engine" value="google">
+            <span>Google Translate</span>
+          </label>
+          <div class="sub-panel" id="panel-google">
+            <div class="sub-panel__inner">
+              <label class="mc-radio-sm"><input type="radio" name="google-mode" value="single"><span>Построчно (точно)</span></label>
+              <label class="mc-radio-sm"><input type="radio" name="google-mode" value="batch"><span>Пачками (быстро)</span></label>
+            </div>
+          </div>
+
+          <label class="mc-radio">
+            <input type="radio" name="engine" value="deepl">
+            <span>DeepL API</span>
+          </label>
+
+          <label class="mc-radio">
+            <input type="radio" name="engine" value="ai">
+            <span>Нейросеть (ИИ)</span>
+          </label>
+          <div class="sub-panel" id="panel-ai">
+            <div class="sub-panel__inner">
+              <div class="sub-label">Провайдер:</div>
+              <label class="mc-radio-sm"><input type="radio" name="ai-provider" value="local"><span>Локально (KoboldCPP)</span></label>
+              <label class="mc-radio-sm"><input type="radio" name="ai-provider" value="openrouter"><span>OpenRouter (облако)</span></label>
+              <label class="mc-radio-sm"><input type="radio" name="ai-provider" value="custom"><span>Другой ИИ (свой API)</span></label>
+              <label class="mc-radio-sm"><input type="radio" name="ai-provider" value="anthropic"><span>Claude (Anthropic)</span></label>
+              <button class="btn btn-small" id="btn-or-autocycle" style="display:none">🔁 Авто-перебор бесплатных моделей: ВЫКЛ</button>
+              <label class="mc-radio-sm mc-radio-sm-top"><input type="radio" name="ai-mode" value="safe"><span>Безопасный (20 строк)</span></label>
+              <label class="mc-radio-sm"><input type="radio" name="ai-mode" value="context"><span>Контекст + лор (40 строк)</span></label>
+            </div>
+          </div>
+        </section>
+
+        <section class="rail-card" style="--i:5">
+          <h3 class="rail-card__title">Режим обработки</h3>
+          <label class="mc-radio"><input type="radio" name="process-mode" value="append"><span>Доперевод (сохранить старое)</span></label>
+          <label class="mc-radio"><input type="radio" name="process-mode" value="skip"><span>Пропуск (от 90%)</span></label>
+          <label class="mc-radio"><input type="radio" name="process-mode" value="force"><span>С нуля (перезапись)</span></label>
+        </section>
+
+        <button class="btn btn-analyze" id="btn-analyze" style="--i:6">Анализ сборки</button>
+      </div>
+
+      <div class="rail-footer">
+        <button class="btn btn-start" id="btn-start">▶ НАЧАТЬ ПЕРЕВОД</button>
+        <div class="rail-footer__row">
+          <button class="btn btn-pause" id="btn-pause" disabled>⏸ ПАУЗА</button>
+          <button class="btn btn-stop" id="btn-stop" disabled>⏹ ОСТАНОВИТЬ</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="content-toolbar">
+        <div class="activity-chip slot-frame" id="busy-sprite" title="Идёт перевод..."></div>
+        <button class="btn btn-secondary content-toolbar__review" id="btn-review">📝 Проверить переводы</button>
+      </div>
+
+      <div class="log-panel" id="log-panel"></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="status-label" id="status-label">Ожидание...</div>
+    </main>
+  </div>
+
+  <!-- Settings drawer -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer" id="settings-drawer">
+    <h2>⚙ Настройки MC Translator</h2>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-local-ai">Локальный ИИ</button>
+      <button class="tab-btn" data-tab="tab-openrouter">OpenRouter</button>
+      <button class="tab-btn" data-tab="tab-custom-ai">Другой ИИ</button>
+      <button class="tab-btn" data-tab="tab-anthropic">Claude</button>
+      <button class="tab-btn" data-tab="tab-general">Общие и API</button>
+      <button class="tab-btn" data-tab="tab-filetypes">Типы файлов</button>
+    </div>
+
+    <div class="tab-content active" id="tab-local-ai">
+      <button class="btn" id="btn-auto-setup-ai">🚀 Настроить локальный ИИ автоматически</button>
+      <p class="field-hint">Определит вашу видеокарту, скачает подходящую по размеру модель и движок KoboldCPP и настроит поля ниже сама.</p>
+      <hr class="field-divider">
+
+      <label class="field-label">Исполняемый файл KoboldCPP (.exe):</label>
+      <div class="field-row">
+        <input type="text" id="set-ai-exe" class="mc-input">
+        <button class="btn btn-small" id="btn-browse-exe">Обзор</button>
+      </div>
+
+      <label class="field-label">Модель (.gguf):</label>
+      <div class="field-row">
+        <input type="text" id="set-ai-model" class="mc-input">
+        <button class="btn btn-small" id="btn-browse-model">Обзор</button>
+      </div>
+
+      <label class="field-label">Глобальный контекст (лор сборки):</label>
+      <input type="text" id="set-ai-context" class="mc-input" placeholder="Напр: Это сборка про магию и средневековье...">
+
+      <label class="field-label">Слои GPU: <span id="lbl-gpu-val">99</span></label>
+      <input type="range" id="set-gpu-layers" class="mc-slider" min="0" max="99" step="1">
+    </div>
+
+    <div class="tab-content" id="tab-openrouter">
+      <p class="field-hint">Ключ: openrouter.ai/keys</p>
+      <label class="field-label">API ключ OpenRouter:</label>
+      <input type="password" id="set-or-key" class="mc-input">
+
+      <label class="field-label">ID модели (напр. qwen/qwen-2.5-72b-instruct):</label>
+      <input type="text" id="set-or-model" class="mc-input">
+
+      <label class="field-label">Site URL (необязательно, для статистики):</label>
+      <input type="text" id="set-or-site" class="mc-input">
+
+      <label class="field-label">Название приложения (X-Title):</label>
+      <input type="text" id="set-or-app" class="mc-input">
+
+      <hr class="field-divider">
+      <p class="field-hint">
+        🔁 Авто-перебор бесплатных моделей включается кнопкой в панели «Нейросеть» слева.
+        При исчерпании лимита одной бесплатной модели программа сама переключится на
+        следующую, а когда закончатся все — подождёт сброса лимитов и продолжит.
+      </p>
+      <label class="field-label">Свои бесплатные модели для перебора (по одной на строку, необязательно):</label>
+      <textarea id="set-or-free-models" class="mc-input" rows="4" placeholder="Пусто = автоматически загрузить все :free модели с OpenRouter"></textarea>
+    </div>
+
+    <div class="tab-content" id="tab-custom-ai">
+      <p class="field-hint">
+        Любой ИИ с OpenAI-совместимым API (chat/completions): NVIDIA NIM (много бесплатных
+        моделей), OpenAI, Google Gemini, xAI Grok, Groq, DeepSeek, Mistral, локальный
+        Ollama/LM Studio и т.д.
+      </p>
+      <label class="field-label">Готовый провайдер (подставит URL):</label>
+      <select id="set-custom-preset" class="mc-select"></select>
+
+      <label class="field-label">URL эндпоинта (chat/completions):</label>
+      <input type="text" id="set-custom-url" class="mc-input" placeholder="https://api.openai.com/v1/chat/completions">
+
+      <label class="field-label">API ключ (необязательно для локальных серверов):</label>
+      <input type="password" id="set-custom-key" class="mc-input">
+
+      <label class="field-label">ID модели:</label>
+      <input type="text" id="set-custom-model" class="mc-input" placeholder="напр. gpt-4o-mini">
+      <p class="field-hint">
+        При лимите запросов (429) программа сама подождёт сброса и продолжит с той же моделью —
+        без переключения (для многих API, включая NVIDIA NIM, лимит общий на весь ключ, а не на
+        отдельную модель, так что смена модели всё равно не помогает).
+      </p>
+    </div>
+
+    <div class="tab-content" id="tab-anthropic">
+      <p class="field-hint">Claude — отдельный протокол (не OpenAI-совместимый), поэтому своя вкладка. Ключ: console.anthropic.com</p>
+      <label class="field-label">API ключ Anthropic:</label>
+      <input type="password" id="set-anthropic-key" class="mc-input">
+
+      <label class="field-label">ID модели:</label>
+      <input type="text" id="set-anthropic-model" class="mc-input" placeholder="напр. claude-sonnet-4-5-20250929">
+    </div>
+
+    <div class="tab-content" id="tab-general">
+      <label class="mc-switch">
+        <input type="checkbox" id="set-smart-glue">
+        <span>✨ Умный склейщик предложений</span>
+      </label>
+
+      <label class="field-label">Потоки Google Translate: <span id="lbl-workers-val">5</span></label>
+      <input type="range" id="set-google-workers" class="mc-slider" min="1" max="10" step="1">
+
+      <label class="field-label">API ключ DeepL:</label>
+      <input type="password" id="set-deepl-key" class="mc-input">
+    </div>
+
+    <div class="tab-content" id="tab-filetypes">
+      <p class="field-hint">Какие типы файлов переводить (в дополнение к переключателям «Что переводим?» в сайдбаре). По умолчанию — все включены.</p>
+      <div class="filetypes-actions">
+        <button class="btn btn-small" id="btn-filetypes-all">Выбрать все</button>
+        <button class="btn btn-small" id="btn-filetypes-none">Снять все</button>
+      </div>
+      <div id="filetypes-list" class="filetypes-list"></div>
+    </div>
+
+    <button class="btn btn-start" id="btn-save-settings">💾 Сохранить настройки</button>
+  </aside>
+
+  <!-- Themed confirm modal (replaces messagebox.askyesno) -->
+  <div class="modal-backdrop" id="confirm-backdrop">
+    <div class="modal" id="confirm-modal">
+      <h3 id="confirm-title"></h3>
+      <p id="confirm-message"></p>
+      <div class="modal-actions">
+        <button class="btn btn-stop" id="confirm-no">Отмена</button>
+        <button class="btn btn-start" id="confirm-yes">Да</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selective cache-clear modal -->
+  <div class="modal-backdrop" id="cache-clear-backdrop">
+    <div class="modal cache-clear-modal" id="cache-clear-modal">
+      <h3>🧹 Очистить кэш переводов</h3>
+
+      <div class="field-label">Язык:</div>
+      <label class="mc-radio-sm"><input type="radio" name="cache-clear-lang" value="current" checked><span>Текущий (<span id="cache-clear-lang-name"></span>)</span></label>
+      <label class="mc-radio-sm"><input type="radio" name="cache-clear-lang" value="all"><span>Все языки</span></label>
+
+      <div class="field-label">Что чистить:</div>
+      <label class="mc-radio-sm"><input type="radio" name="cache-clear-mode" value="all" checked><span>Весь кэш</span></label>
+      <label class="mc-radio-sm"><input type="radio" name="cache-clear-mode" value="mods"><span>По модам</span></label>
+      <label class="mc-radio-sm"><input type="radio" name="cache-clear-mode" value="kinds"><span>По типам</span></label>
+
+      <div class="cache-clear-checklist" id="cache-clear-checklist"></div>
+      <p class="cache-clear-empty" id="cache-clear-empty">Для выбранного языка ещё нет накопленных данных об использовании.</p>
+
+      <p class="field-hint" id="cache-clear-hint">Весь накопленный кэш переводов будет очищен из памяти, а файлы кэша переименованы в резервные копии (*.bak-дата) рядом с ними.</p>
+
+      <div class="modal-actions">
+        <button class="btn btn-stop" id="cache-clear-cancel">Отмена</button>
+        <button class="btn btn-start" id="cache-clear-confirm">Очистить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completion celebration overlay -->
+  <div class="celebrate-overlay" id="celebrate-overlay">
+    <div class="celebrate-confetti" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span>
+    </div>
+    <div class="celebrate-banner" id="celebrate-banner"></div>
+  </div>
+
+  <!-- Translation review screen -->
+  <div class="review-overlay" id="review-overlay">
+    <div class="review-toolbar">
+      <input type="text" id="review-search" class="mc-input review-search" placeholder="🔎 Поиск по оригиналу или переводу...">
+      <span class="review-count" id="review-count"></span>
+      <button class="btn btn-secondary review-refresh" id="btn-review-refresh" title="Обновить список (подтянуть новые переводы)">🔄</button>
+      <button class="btn btn-start review-rebuild" id="btn-rebuild-pack" disabled>🔨 Пересобрать пак</button>
+      <button class="btn btn-stop review-close" id="btn-review-close">✕ Закрыть</button>
+    </div>
+    <div class="review-table-wrap">
+      <div class="review-table-header">
+        <div>Оригинал</div>
+        <div>Перевод</div>
+        <div>Где используется</div>
+        <div>Тип</div>
+      </div>
+      <div class="review-table-body" id="review-table-body"></div>
+      <div class="review-empty" id="review-empty">Здесь пока пусто. Запустите перевод, чтобы строки появились для проверки.</div>
+      <button class="btn review-load-more" id="btn-review-load-more">Показать ещё</button>
+    </div>
+  </div>
+
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

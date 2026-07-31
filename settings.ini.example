@@ -1,0 +1,58 @@
+[GENERAL]
+mc_dir =
+theme = Dark
+color = blue
+smart_glue = True
+google_workers = 10
+
+[AI]
+exe_path = koboldcpp.exe
+model_path =
+gpu_layers = 99
+ai_provider = local
+global_context =
+
+[API]
+deepl_key =
+
+[OPENROUTER]
+api_key =
+model = google/gemma-2-9b-it:free
+site_url =
+app_name = MC Translator
+auto_cycle_free = False
+free_models =
+
+[CUSTOM_AI]
+api_key =
+model = gpt-4o-mini
+base_url = https://api.openai.com/v1/chat/completions
+
+[ANTHROPIC]
+api_key =
+model =
+
+[SESSION]
+language = Русский
+mc_version = 1.21.1
+output_mode = resourcepack
+pack_name = MCTranslator_Pack
+translate_mods = True
+translate_books = True
+translate_quests = True
+engine = google
+google_mode = single
+ai_mode = safe
+process_mode = append
+
+[FILETYPES]
+generic_json = True
+lang = True
+nbt = True
+yaml_toml = True
+text = True
+cfg = True
+xml = True
+bat = True
+mcfunction = True
+archive = True

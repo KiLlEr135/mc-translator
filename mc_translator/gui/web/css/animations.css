@@ -1,0 +1,265 @@
+/* Motion design for MC Translator. Every transition/keyframe in the app
+   lives in this one file — tokens.css/base.css/layout.css/components.css
+   only ever set resting-state looks. Contract, unchanged from the
+   previous pass and still enforced: JS only ever toggles a class — no
+   per-frame JS animation loop anywhere. Everything here is either a CSS
+   transition triggered by a class flip, or a self-running @keyframes
+   gated by a class/parent selector. */
+
+/* ---------------------------------------------------------------- */
+/* 0. Rail entrance — cards + the analyze button cascade in on load,   */
+/*    staggered purely via the inline --i custom property set in       */
+/*    index.html (0..6). No JS involvement.                            */
+/* ---------------------------------------------------------------- */
+.rail-scroll > * {
+  animation: cardIn 380ms var(--ease-spring) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Card hover — subtle lift + brighter edge, same spring feel used by the
+   drawer/review screen elsewhere in this file. */
+.rail-card {
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) ease, border-color var(--dur-base) ease;
+}
+.rail-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border-strong);
+}
+
+/* ---------------------------------------------------------------- */
+/* 1. Buttons: lift+glow hover, springy press, enchantment-glint sweep  */
+/*    (static glint shape/colors live in components.css's .btn::after). */
+/* ---------------------------------------------------------------- */
+.btn {
+  transition:
+    filter var(--dur-fast) ease,
+    transform 0.15s var(--ease-spring),
+    box-shadow var(--dur-base) ease,
+    background var(--dur-fast) ease;
+}
+.btn::after { transition: left 0.5s ease; }
+.btn:hover:not(:disabled)::after { left: 130%; }
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--btn-glow);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: var(--shadow-xs);
+}
+
+.icon-btn {
+  transition: transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+
+/* ---------------------------------------------------------------- */
+/* 1b. Custom checkbox/radio: shape pop-in + selection glow ring        */
+/*     (shapes in components.css).                                      */
+/* ---------------------------------------------------------------- */
+input[type="checkbox"], input[type="radio"] {
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+input[type="checkbox"]::after,
+input[type="radio"]::after {
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+input[type="checkbox"]:checked::after,
+input[type="radio"]:checked::after {
+  transform: scale(1);
+}
+input[type="radio"]:checked {
+  animation: radioPulse 500ms var(--ease-out);
+}
+@keyframes radioPulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); }
+  100% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+
+/* 1c. Input/select focus glow — transition only; static glow lives in
+   components.css. */
+.mc-input, .mc-select {
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+
+/* 1d. Unified keyboard-focus ring for every interactive element. */
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.mc-select:focus-visible,
+.mc-input:focus-visible {
+  transition: box-shadow var(--dur-fast) ease;
+}
+
+/* ---------------------------------------------------------------- */
+/* 2. Progress-bar fill + shine sweep (static gradient in                */
+/*    components.css).                                                   */
+/* ---------------------------------------------------------------- */
+.progress-fill { transition: width 300ms var(--ease-out); }
+.progress-fill::after { animation: progressShine 1.4s linear infinite; }
+@keyframes progressShine {
+  from { background-position: -80px 0; }
+  to   { background-position: 260px 0; }
+}
+
+/* 2b. Ambient log-panel scan-shimmer while a job is running (static
+   ::before in components.css). Gated by .job-running, toggled from
+   app.js's setJobState() — the corner activity chip isn't the only thing
+   that animates, this ambient sweep reinforces "still working" even when
+   the chip is out of the eye's focus. */
+.log-panel.job-running::before {
+  opacity: 1;
+  background: linear-gradient(180deg, transparent, rgba(126, 224, 138, 0.06), transparent);
+  background-size: 100% 140px;
+  background-repeat: no-repeat;
+  animation: logShimmer 4.5s ease-in-out infinite;
+}
+@keyframes logShimmer {
+  0%   { background-position: 0 -160px; }
+  100% { background-position: 0 calc(100% + 160px); }
+}
+
+/* 2c. "Still typing" caret after the most recent log line — only while a
+   job is actually running, so an idle log doesn't look like it's mid
+   sentence. */
+.log-panel.job-running .log-line:last-child::after {
+  content: "\258C";
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--log-cyan);
+  animation: caretBlink 1s steps(1) infinite;
+}
+@keyframes caretBlink {
+  50% { opacity: 0; }
+}
+
+/* ---------------------------------------------------------------- */
+/* 3. Engine/output accordion sub-panels — grid-rows technique (static   */
+/*    0fr/1fr states in layout.css); animates the actual measured        */
+/*    content height instead of a guessed max-height ceiling.            */
+/* ---------------------------------------------------------------- */
+.sub-panel { transition: grid-template-rows var(--dur-slow) var(--ease-out); }
+.sub-panel__inner { transition: opacity 180ms ease; opacity: 0; }
+.sub-panel.open .sub-panel__inner { opacity: 1; }
+
+/* ---------------------------------------------------------------- */
+/* 4. Settings drawer + review screen: spring/overshoot easing for a     */
+/*    tactile, less "linear slide" feel.                                 */
+/* ---------------------------------------------------------------- */
+.drawer { transition: transform 320ms var(--ease-spring); }
+.drawer-backdrop { transition: opacity 260ms var(--ease-out); }
+.drawer.open { transform: translateX(0); }
+
+/* ---------------------------------------------------------------- */
+/* 5. Log line reveal (per-line, never per-character) + review-row       */
+/*    reveal (same keyframe, no per-row stagger — rows can land in       */
+/*    batches of up to 300 via pagination/search, so a per-item delay    */
+/*    would make rapid search typing feel sluggish).                     */
+/* ---------------------------------------------------------------- */
+@keyframes logLineIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.log-line { animation: logLineIn 160ms var(--ease-out); }
+.review-row { animation: logLineIn 200ms var(--ease-out); }
+
+/* ---------------------------------------------------------------- */
+/* 6. Version auto-detect success pulse + shared save-confirmation       */
+/*    pulse for any editable translatable element (Review rows and       */
+/*    live log-translation lines alike).                                 */
+/* ---------------------------------------------------------------- */
+@keyframes detectPulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+  70%  { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+.pulse-success { animation: detectPulse 700ms var(--ease-out); border-color: var(--accent) !important; }
+.review-row.saved-pulse,
+.log-translation.saved-pulse {
+  animation: detectPulse 700ms var(--ease-out);
+}
+
+/* ---------------------------------------------------------------- */
+/* 7. Idle/busy indicator — procedural CSS flame. Two blob layers        */
+/*    (outer body + inner hot core), independently timed so they drift   */
+/*    out of sync the way real fire flickers.                            */
+/* ---------------------------------------------------------------- */
+.activity-chip.active::before { animation: flameOuter 1.1s ease-in-out infinite; }
+.activity-chip.active::after  { animation: flameInner 0.85s ease-in-out infinite; }
+
+@keyframes flameOuter {
+  0%, 100% { transform: scaleY(1) scaleX(1) rotate(-2deg); }
+  30%      { transform: scaleY(1.08) scaleX(0.94) rotate(2deg); }
+  55%      { transform: scaleY(0.92) scaleX(1.06) rotate(-3deg); }
+  80%      { transform: scaleY(1.05) scaleX(0.97) rotate(1deg); }
+}
+@keyframes flameInner {
+  0%, 100% { transform: scaleY(1) translateY(0); }
+  50%      { transform: scaleY(0.82) translateY(2px); }
+}
+
+/* ---------------------------------------------------------------- */
+/* 8. Start/success celebration — banner pop + block-confetti fall.      */
+/* ---------------------------------------------------------------- */
+@keyframes celebratePop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.celebrate-overlay.show {
+  opacity: 1;
+  animation: celebrateFade 1800ms ease-in-out forwards;
+}
+.celebrate-overlay.show .celebrate-banner {
+  animation: celebratePop 400ms ease-out;
+}
+@keyframes celebrateFade {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Confetti: 12 pre-authored spans (index.html), each with a deterministic
+   per-child duration/delay/rotation so the fall reads as scattered rather
+   than a synchronized grid, with zero JS/randomness involved. */
+.celebrate-confetti span { animation-play-state: paused; opacity: 0; }
+.celebrate-overlay.show .celebrate-confetti span {
+  animation: confettiFall 1400ms ease-in forwards;
+  animation-play-state: running;
+}
+@keyframes confettiFall {
+  0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+  10%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(220px) rotate(340deg); }
+}
+.celebrate-confetti span:nth-child(1)  { animation-duration: 1200ms; animation-delay: 0ms; }
+.celebrate-confetti span:nth-child(2)  { animation-duration: 1450ms; animation-delay: 60ms; }
+.celebrate-confetti span:nth-child(3)  { animation-duration: 1300ms; animation-delay: 120ms; }
+.celebrate-confetti span:nth-child(4)  { animation-duration: 1550ms; animation-delay: 40ms; }
+.celebrate-confetti span:nth-child(5)  { animation-duration: 1250ms; animation-delay: 160ms; }
+.celebrate-confetti span:nth-child(6)  { animation-duration: 1400ms; animation-delay: 90ms; }
+.celebrate-confetti span:nth-child(7)  { animation-duration: 1350ms; animation-delay: 200ms; }
+.celebrate-confetti span:nth-child(8)  { animation-duration: 1500ms; animation-delay: 20ms; }
+.celebrate-confetti span:nth-child(9)  { animation-duration: 1220ms; animation-delay: 140ms; }
+.celebrate-confetti span:nth-child(10) { animation-duration: 1480ms; animation-delay: 70ms; }
+.celebrate-confetti span:nth-child(11) { animation-duration: 1320ms; animation-delay: 180ms; }
+.celebrate-confetti span:nth-child(12) { animation-duration: 1260ms; animation-delay: 110ms; }
+
+/* Modal pop — re-triggers each time the ancestor backdrop flips from
+   display:none to flex (CSS animations restart when an element re-enters
+   layout the same way it did before this pass). */
+.modal { animation: celebratePop 180ms ease-out; }
+
+/* Review screen fade+scale-in (spring easing, same tactile feel as the
+   drawer). */
+@keyframes reviewFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.review-overlay.open { animation: reviewFadeIn 220ms var(--ease-spring); }

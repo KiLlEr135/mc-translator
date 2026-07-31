@@ -1,0 +1,606 @@
+/* MC Translator — visual styling for every component: color, border,
+   shadow, radius, typography, iconography. Structural placement (position,
+   size, flex/grid) lives in layout.css. Transitions/keyframes live in
+   animations.css — this file only ever sets the resting-state look. */
+
+/* ---------------------------------------------------------------- */
+/* Header                                                             */
+/* ---------------------------------------------------------------- */
+
+.app-header {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.brand-badge {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.brand-word {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.icon-btn:hover {
+  background: var(--bg-surface-3);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
+/* ---------------------------------------------------------------- */
+/* Rail                                                               */
+/* ---------------------------------------------------------------- */
+
+.rail {
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.035) 1px, transparent 0) 0 0 / 12px 12px,
+    var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
+}
+
+.rail-card {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  padding: var(--space-3);
+}
+
+.rail-card__title {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  margin-bottom: var(--space-2);
+}
+
+.folder-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  margin-bottom: var(--space-2);
+  word-break: break-all;
+}
+
+.rail-footer {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: 0 -8px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------------------------------------------------------------- */
+/* Buttons                                                            */
+/* ---------------------------------------------------------------- */
+
+.btn {
+  --btn-bg: var(--neutral);
+  --btn-bg-hover: var(--neutral-hover);
+  --btn-fg: var(--text-primary);
+  --btn-glow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+  cursor: pointer;
+  margin: 0;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Enchantment-glint sweep — diagonal shine band, swept in on hover
+   (transition/keyframe timing lives in animations.css). Kept as the one
+   deliberate Minecraft signature motion carried over from the old theme. */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 30%;
+  height: 220%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-secondary { --btn-bg: var(--bg-surface-3); --btn-bg-hover: var(--neutral-hover); }
+.btn-analyze   { --btn-bg: var(--info); --btn-bg-hover: var(--info-strong); --btn-glow: var(--glow-info); }
+.btn-start     { --btn-bg: var(--accent); --btn-bg-hover: var(--accent-strong); --btn-glow: var(--glow-accent); --btn-fg: var(--text-on-accent); }
+.btn-pause     { --btn-bg: var(--warn); --btn-bg-hover: var(--warn-strong); --btn-glow: var(--glow-warn); --btn-fg: #241f0f; }
+.btn-pause.btn-pause-active { --btn-bg: var(--warn-strong); }
+.btn-stop      { --btn-bg: var(--danger); --btn-bg-hover: var(--danger-strong); --btn-glow: var(--glow-danger); }
+
+.btn:hover:not(:disabled) { background: var(--btn-bg-hover); }
+
+.btn-small {
+  width: auto;
+  font-size: var(--fs-xs);
+  padding: var(--space-1) var(--space-2);
+}
+
+/* ---------------------------------------------------------------- */
+/* Form controls                                                      */
+/* ---------------------------------------------------------------- */
+
+.mc-select, .mc-input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  margin: 2px 0 var(--space-2) 0;
+}
+
+.mc-select:focus, .mc-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+
+.mc-input:disabled { opacity: 0.4; }
+
+.mc-radio, .mc-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 0;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.mc-radio-sm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px 0 2px 20px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.mc-radio-sm-top { margin-top: var(--space-2); }
+
+.sub-label {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  padding-left: 20px;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Custom checkbox/radio: appearance:none + our own ::after shape. A
+   pseudo-element on the <input> itself (not a sibling SVG) so the same
+   CSS renders correctly whether the checkbox is static markup or one of
+   the checklists app.js builds at runtime (cache-clear/filetypes) — those
+   only ever create <input>+<span>, no decorative child, so any "draw the
+   check via a sibling SVG" approach would silently render blank there. */
+input[type="checkbox"], input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+}
+
+input[type="checkbox"] { border-radius: 4px; }
+input[type="radio"] { border-radius: 50%; }
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  border-color: var(--accent);
+}
+
+/* Checkmark glyph via clip-path polygon (a real check shape, not a filled
+   square) — scales in on :checked, see animations.css. */
+input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  clip-path: polygon(21% 53%, 9% 65%, 40% 96%, 90% 30%, 80% 18%, 39% 72%);
+  transform: scale(0);
+}
+
+input[type="radio"]::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: scale(0);
+}
+
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-accent);
+}
+
+/* ---------------------------------------------------------------- */
+/* Content / log / progress                                           */
+/* ---------------------------------------------------------------- */
+
+.log-panel {
+  position: relative;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* Ambient "work is happening" scan-shimmer while a job is running (see
+   animations.css) — ::before so it never interferes with text selection
+   or paint order of the actual log lines, which are real children. */
+.log-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+}
+
+.log-line { margin: 0; padding: 0; }
+.tag-green   { color: var(--log-green); }
+.tag-yellow  { color: var(--log-yellow); }
+.tag-red     { color: var(--log-red); }
+.tag-cyan    { color: var(--log-cyan); }
+.tag-magenta { color: var(--log-magenta); }
+.tag-dim     { color: var(--log-dim); }
+.tag-white   { color: var(--text-primary); }
+
+.log-row-icon { color: var(--log-cyan); }
+.log-row-kind { color: var(--log-magenta); }
+.log-row-pct-green  { color: var(--log-green); }
+.log-row-pct-yellow { color: var(--log-yellow); }
+.log-row-pct-red    { color: var(--log-red); }
+
+.log-translation {
+  padding: 1px 0 1px var(--space-2);
+  border-left: 2px solid var(--log-cyan);
+}
+.log-translation.edited { border-left-color: var(--accent); background: var(--accent-soft); }
+.log-translation-source { color: var(--text-secondary); }
+.log-translation-arrow { color: var(--log-dim); }
+.log-translation-value {
+  color: var(--text-primary);
+  cursor: text;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.log-translation-value:hover { border-bottom-color: var(--log-cyan); }
+.log-translation-value textarea {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  min-height: 36px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+  margin-top: 2px;
+  resize: vertical;
+}
+.log-translation-search {
+  margin-left: var(--space-2);
+  cursor: pointer;
+  opacity: 0;
+}
+.log-translation:hover .log-translation-search { opacity: 0.75; }
+.log-translation-search:hover { opacity: 1; }
+
+.progress-track {
+  height: 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to bottom, #6bcf5a, var(--accent-strong));
+}
+
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+  background-size: 60px 100%;
+  background-repeat: no-repeat;
+}
+
+.status-label {
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+/* Activity chip — procedural CSS flame housed in a small pixel item-slot
+   frame (see .slot-frame below); flame layers/keyframes in animations.css. */
+.activity-chip.active {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(255, 150, 40, 0.55));
+}
+.activity-chip::before,
+.activity-chip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform-origin: bottom center;
+  opacity: 0;
+}
+.activity-chip.active::before {
+  width: 18px;
+  height: 24px;
+  margin-left: -9px;
+  background: radial-gradient(circle at 50% 70%, #ffdd66 0%, #ff9d2e 45%, #e2531f 78%, transparent 100%);
+  opacity: 1;
+}
+.activity-chip.active::after {
+  width: 8px;
+  height: 14px;
+  margin-left: -4px;
+  bottom: 6px;
+  background: radial-gradient(circle at 50% 60%, #fff6d0 0%, #ffe066 60%, transparent 100%);
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------- */
+/* Slot-frame — the one intentional pixel-inventory callback: sharp
+   corners + inset light/dark bevel, used sparingly (header badge, activity
+   chip) rather than across the whole shell.                             */
+/* ---------------------------------------------------------------- */
+
+.slot-frame {
+  border-radius: var(--radius-sharp);
+  background: var(--bg-input);
+  border: 2px solid var(--bevel-dark);
+  border-top-color: var(--bevel-light);
+  border-left-color: var(--bevel-light);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------------------------------------------------------------- */
+/* Settings drawer                                                    */
+/* ---------------------------------------------------------------- */
+
+.drawer {
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-lg);
+}
+.drawer-backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.drawer h2 {
+  font-size: var(--fs-md);
+  margin-bottom: var(--space-3);
+}
+
+.tab-btn {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  background: var(--bg-surface-3);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) 2px;
+  cursor: pointer;
+}
+.tab-btn.active {
+  background: var(--info);
+  color: #fff;
+  border-color: var(--info);
+}
+
+.field-label {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: var(--space-3) 0 3px 0;
+}
+.field-hint { font-size: var(--fs-2xs); color: var(--text-tertiary); line-height: var(--lh-base); }
+.field-divider { border: none; border-top: 1px solid var(--border-subtle); margin: var(--space-3) 0; }
+
+.mc-slider {
+  width: 100%;
+  accent-color: var(--accent);
+  margin: var(--space-1) 0 var(--space-2) 0;
+}
+
+.mc-switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  cursor: pointer;
+  font-size: var(--fs-sm);
+}
+
+/* ---------------------------------------------------------------- */
+/* Modals                                                             */
+/* ---------------------------------------------------------------- */
+
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.modal h3 { margin-bottom: var(--space-2); font-size: var(--fs-md); }
+.modal p { font-size: var(--fs-sm); color: var(--text-secondary); line-height: var(--lh-base); white-space: pre-line; }
+
+.cache-clear-checklist {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+.cache-clear-empty {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin: var(--space-1) 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Celebration overlay                                                */
+/* ---------------------------------------------------------------- */
+
+.celebrate-banner {
+  background: var(--accent);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text-on-accent);
+  position: relative;
+}
+
+.celebrate-confetti span {
+  border-radius: 2px;
+  background: var(--accent);
+}
+.celebrate-confetti span:nth-child(3n)   { background: var(--info); }
+.celebrate-confetti span:nth-child(3n+1) { background: var(--warn); }
+
+/* ---------------------------------------------------------------- */
+/* Translation review screen                                          */
+/* ---------------------------------------------------------------- */
+
+.review-overlay {
+  background: var(--bg-app);
+}
+
+.review-count { font-size: var(--fs-xs); color: var(--text-tertiary); white-space: nowrap; }
+
+.review-table-wrap {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.review-table-header {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  background: var(--bg-surface-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.review-row {
+  font-size: var(--fs-sm);
+  border-bottom: 1px solid var(--border-hairline);
+  align-items: start;
+}
+.review-row.edited { background: var(--accent-soft); }
+
+.review-col-source { color: var(--text-secondary); word-break: break-word; }
+.review-col-translated { word-break: break-word; cursor: text; }
+.review-col-translated textarea {
+  width: 100%;
+  min-height: 40px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+  resize: vertical;
+}
+.review-col-mods { font-size: var(--fs-xs); color: var(--text-tertiary); word-break: break-word; }
+.review-col-kind { font-size: var(--fs-xs); color: var(--log-cyan); }
+
+.review-empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  color: var(--text-tertiary);
+  font-size: var(--fs-md);
+}
+
+/* ---------------------------------------------------------------- */
+/* Focus ring — one consistent style for keyboard navigation             */
+/* ---------------------------------------------------------------- */
+
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.mc-select:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-accent);
+}
